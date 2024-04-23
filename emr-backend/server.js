@@ -1,12 +1,14 @@
 const express = require('express');
+const cors = require('cors');
 
 const app = express();
 
-app.use(express.json());
+var corsOption = {
+    origin: '*'
+}
 
-app.get('/', (req, res) => {
-    res.send('<h1>Hello</h1>');
-})
+app.use(express.json());
+app.use(cors(corsOption));
 
 const patientsRoute = require('./routes/patients');
 

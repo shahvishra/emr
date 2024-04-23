@@ -1,23 +1,23 @@
 import logo from './logo.svg';
 import './App.css';
+import React, {useState, useEffect} from "react";
 
 function App() {
+  const [patients, setPatients] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/patients")
+    .then((res) => res.json())
+    .then((data) => setPatients(data.patients));
+  }, []);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {patients.map((patient, index) => (
+        <div key={index}>
+          <span>{patient.PREFERREDNAME}</span>
+          <span>{patient.INTERNALID}</span>
+        </div>
+      ))}
     </div>
   );
 }
