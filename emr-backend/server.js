@@ -5,7 +5,7 @@ const app = express();
 
 var corsOption = {
     origins: ['http://localhost:3001/'],
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST", "DELETE"]
 }
 
 app.use(express.json());

@@ -16,6 +16,7 @@ function App() {
   const [patients, setPatients] = useState([]);
   const [show, setShow] = useState(false);
   const [formData, setFormData] = useState({
+    internalId: patients.length,
     title: "Select",
     firstName: "",
     middleName: "",
@@ -52,10 +53,30 @@ function App() {
       e.stopPropagation();
     } else {
       savePatientData();
+      resetFormData();
       setValidated(true);
       handleClose();
     }
   };
+
+  const resetFormData = () => {
+    setFormData({
+      internalId: patients.length,
+      title: "Select",
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      gender: "Select",
+      dob: "",
+      phoneNumber: "",
+      address1: "",
+      address2: "",
+      city: "",
+      state: "Select",
+      zip: "",
+      referredBy: "",
+    });
+  }
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -67,6 +88,7 @@ function App() {
   };
 
   const savePatientData = () => {
+    formData.internalId += 1;
     fetch('http://localhost:3001/patients/save', {
       method: 'POST',
       headers: {
@@ -82,6 +104,17 @@ function App() {
       .catch((error) => {
         console.error('Error:', error);
       });
+  }
+
+  const deletePatientData = (id) => {
+    fetch(`http://localhost:3001/patients/delete/${id}`, {method: 'DELETE'}).then(response => response.json())
+    .then(data => {
+      console.log('Delete successfull');
+      loadPatientsData();
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    })
   }
 
   const loadPatientsData = () => {
@@ -100,7 +133,7 @@ function App() {
         <Stack direction="vertical" gap={3}>
           <Card style={{ marginTop: 1 + "rem", backgroundColor: "#ccccff" }}>
             <Card.Body>
-              <h2>Electoronic Medical Records</h2>
+              <h2>Electronic Medical Records</h2>
             </Card.Body>
           </Card>
           <Card>
@@ -155,7 +188,7 @@ function App() {
                       <td>{patient.REFERRINGDOCTOR}</td>
                       <td>
                         <Stack direction="horizontal" gap={3}>
-                          <Button variant="danger">
+                          <Button variant="danger" onClick={() => deletePatientData(patient.INTERNALID)}>
                             <FaTrash />
                           </Button>
                         </Stack>

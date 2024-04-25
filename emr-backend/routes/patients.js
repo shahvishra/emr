@@ -11,7 +11,6 @@ connection.connect((err) => {
 });
 
 router.get("", (req, res) => {
-    connection.connect();
   connection.query(`SELECT * FROM PATIENTS`, (err, results) => {
     if (err) {
       console.error("Error querying database:", err);
@@ -24,8 +23,20 @@ router.get("", (req, res) => {
 });
 
 router.post("/save", (req, res) => {
+
   try {
+    maxId = 0;
+    connection.query(`SELECT max(INTERNALID) as maxInternalId FROM PATIENTS`, (err, results) => {
+      if (err) {
+        console.error("Error querying database:", err);
+        return;
+      }
+      maxId = results.maxInternalId;
+      console.log(maxId);
+  
+    });
     const {
+      internalId,
       title,
       firstName,
       middleName,
@@ -44,7 +55,7 @@ router.post("/save", (req, res) => {
       `INSERT INTO PATIENTS (INTERNALID, TITLECODE, FIRSTNAME, MIDDLENAME, SURNAME, DOB, SEXCODE, ADDRESS1, ADDRESS2, CITY, POSTCODE, HOMEPHONE, PLACEOFBIRTH, COUNTRYOFBIRTH, REFERRINGDOCTOR) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        4,
+        maxId,
         title,
         firstName,
         middleName,
@@ -71,6 +82,24 @@ router.post("/save", (req, res) => {
         }
       }
     );
+  } catch (err) {
+    res.status(500).json({
+      message: err,
+    });
+  }
+});
+
+router.delete("/delete/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    const update = connection
+      .query(
+        `DELETE FROM PATIENTS where INTERNALID = ?`,
+        [id]
+      );
+    res.status(200).json({
+      message: "deleted",
+    });
   } catch (err) {
     res.status(500).json({
       message: err,
