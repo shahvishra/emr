@@ -11,6 +11,7 @@ connection.connect((err) => {
 });
 
 router.get("", (req, res) => {
+    connection.connect();
   connection.query(`SELECT * FROM PATIENTS`, (err, results) => {
     if (err) {
       console.error("Error querying database:", err);
@@ -22,39 +23,54 @@ router.get("", (req, res) => {
   });
 });
 
-// router.get("", (req, res) => {
-//   try {
-//     connection.connect((err) => {
-//       if (err) {
-//         console.error("Error connecting to MySQL database:", err);
-//         return;
-//       }
-//       console.log("Connected to MySQL database");
-//     });
-//     const data = connection.query(`SELECT * FROM PATIENTS`);
-//     console.log(data);
-//     res.status(200).json({
-//       user: data[0][0],
-//     });
-//   } catch (err) {
-//     res.status(500).json({
-//       message: err,
-//     });
-//   } finally {
-//     connection.end();
-//   }
-// });
-
-router.get("/:id", (req, res) => {
+router.post("/save", (req, res) => {
   try {
-    const { id } = req.params;
-    console.log(id);
-    const data = connection
-      .promise()
-      .query(`SELECT *  from patients where INTERNALID = ?`, [id]);
-    res.status(200).json({
-      user: data[0][0],
-    });
+    const {
+      title,
+      firstName,
+      middleName,
+      lastName,
+      gender,
+      dob,
+      phoneNumber,
+      address1,
+      address2,
+      city,
+      state,
+      zip,
+      referredBy
+    } = req.body;
+    const [{ insertId }] = connection.query(
+      `INSERT INTO PATIENTS (INTERNALID, TITLECODE, FIRSTNAME, MIDDLENAME, SURNAME, DOB, SEXCODE, ADDRESS1, ADDRESS2, CITY, POSTCODE, HOMEPHONE, PLACEOFBIRTH, COUNTRYOFBIRTH, REFERRINGDOCTOR) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        4,
+        title,
+        firstName,
+        middleName,
+        lastName,
+        dob,
+        gender,
+        address1,
+        address2,
+        city,
+        zip,
+        phoneNumber,
+        city,
+        state,
+        referredBy
+      ],
+      (err, results) => {
+        if (err) {
+          console.error("Error inserting into database:", err);
+          res.status(500).json({ message: "Error inserting into database" });
+          return;
+        } else {
+            console.log(results);
+            res.status(200);
+        }
+      }
+    );
   } catch (err) {
     res.status(500).json({
       message: err,

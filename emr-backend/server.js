@@ -4,7 +4,8 @@ const cors = require('cors');
 const app = express();
 
 var corsOption = {
-    origin: '*'
+    origins: ['http://localhost:3001/'],
+    methods: ["GET", "POST"]
 }
 
 app.use(express.json());
@@ -14,7 +15,7 @@ const patientsRoute = require('./routes/patients');
 
 app.use('/patients', patientsRoute);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)
